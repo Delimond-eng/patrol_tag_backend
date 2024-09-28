@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name("dashboard");
 
+Route::get('/agent.create', function () {
+    return view('add_agent');
+})->name('agent.create');
+
+Route::get('/site.create', function () {
+    return view('add_site_area');
+})->name('site.create');
+
 Route::get('/profile', function () {
     return view('profile');
 })->name("profile");

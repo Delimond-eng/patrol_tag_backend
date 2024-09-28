@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agencie;
 use App\Models\Agent;
+use App\Models\Area;
 use App\Models\Schedules;
 use App\Models\Site;
 use Illuminate\Http\JsonResponse;
@@ -44,7 +45,7 @@ class AdminController extends Controller
 
 
     /**
-     * Add or Create Site for Agency
+     * Add or Create Site for Agency and areas
      * @param Request $request
      * @return JsonResponse
      */
@@ -58,6 +59,9 @@ class AdminController extends Controller
                 "adresse"=>"required|string",
                 "phone"=>"nullable|string",
                 "agency_id"=>"required|int|exists:agencies,id",
+                "areas.*.libelle"=>"required|string",
+                "areas.*.latlng"=>"required|string",
+                "areas.*.qrcode"=>"required|string",
             ]);
             $response = Site::updateOrCreate(
                 [
@@ -66,6 +70,20 @@ class AdminController extends Controller
                 ],
                 $data
             );
+            if($response){
+                //Crée les zones de patrouille pour un site nouvellement créé
+                $areas = $data["areas"];
+                foreach ($areas as $area) {
+                    $area['site_id'] = $response->id;
+                    Area::updateOrCreate(
+                        [
+                            "site_id"=>$area["site_id"],
+                            "libelle"=>$area["libelle"]
+                        ],
+                        $area
+                    );
+                }
+            }
             return response()->json([
                 "status"=>"success",
                 "response"=>$response

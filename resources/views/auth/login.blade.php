@@ -6,7 +6,7 @@
         <!-- BEGIN: Login Info -->
         <div class="hidden xl:flex flex-col min-h-screen">
             <a href="#" class="-intro-x flex items-center pt-5">
-                <img alt="Midone - HTML Admin Template" class="w-6" src="assets/images/logo.svg">
+                <img alt="Midone - HTML Admin Template" class="w-6" src="assets/images/patrol.svg">
                 <span class="text-white text-lg font-extrabold ml-3"> PATROL TAG </span>
             </a>
             <div class="my-auto">
@@ -23,6 +23,7 @@
         <!-- END: Login Info -->
         <!-- BEGIN: Login Form -->
         <form method="POST" action="{{ route('login') }}" class="h-screen xl:h-auto flex py-5 xl:py-0 my-10 xl:my-0">
+            @csrf
             <div class="my-auto mx-auto xl:ml-20 bg-white dark:bg-darkmode-600 xl:bg-transparent px-5 sm:px-8 py-8 xl:p-0 rounded-md shadow-md xl:shadow-none w-full sm:w-3/4 lg:w-2/4 xl:w-auto">
                 <h2 class="intro-x font-bold text-2xl xl:text-3xl text-center xl:text-left">
                     Connexion
@@ -43,8 +44,8 @@
                 </div>
                 <div class="intro-x mt-10 xl:mt-24 text-slate-600 dark:text-slate-500 text-center xl:text-left"> Patrol Tag By Rapid Tech Solution. all right reserved. <a class="text-primary dark:text-slate-200" href="#">Privacy Policy</a> </div>
             </div>
+        </form>
+        <!-- END: Login Form -->
     </div>
-    <!-- END: Login Form -->
-</div>
 </div>
 @endsection
