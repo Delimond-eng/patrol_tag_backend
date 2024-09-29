@@ -54,15 +54,13 @@ class AdminController extends Controller
         try{
             $data = $request->validate([
                 "name"=>"required|string",
-                "code"=>"required|string|unique:code",
-                "latlng"=>"required|string",
+                "code"=>"required|string|unique:sites,code",
+                "latlng"=>"nullable|string",
                 "adresse"=>"required|string",
                 "phone"=>"nullable|string",
-                "agency_id"=>"required|int|exists:agencies,id",
                 "areas.*.libelle"=>"required|string",
-                "areas.*.latlng"=>"required|string",
-                "areas.*.qrcode"=>"required|string",
             ]);
+            $data["agency_id"] = Auth::user()->agency_id;
             $response = Site::updateOrCreate(
                 [
                     "code"=>$data["code"],
@@ -75,18 +73,20 @@ class AdminController extends Controller
                 $areas = $data["areas"];
                 foreach ($areas as $area) {
                     $area['site_id'] = $response->id;
-                    Area::updateOrCreate(
+                    $latestArea = Area::updateOrCreate(
                         [
                             "site_id"=>$area["site_id"],
                             "libelle"=>$area["libelle"]
                         ],
                         $area
                     );
+                    $latestArea->qrcode = json_encode($latestArea);
+                    $latestArea->save();
                 }
             }
             return response()->json([
                 "status"=>"success",
-                "response"=>$response
+                "result"=>$response
             ]);
         }
         catch (\Illuminate\Validation\ValidationException $e) {
@@ -128,9 +128,9 @@ class AdminController extends Controller
                 "matricule"=>"required|string|unique:agents,matricule",
                 "fullname"=>"required|string",
                 "password"=>"required|string",
-                "agency_id"=>"required|int|exists:agencies,id",
                 "site_id"=>"required|int|exists:sites,id"
             ]);
+            $data["agency_id"] = Auth::user()->agency_id;
             $response = Agent::updateOrCreate(
                 [
                     "agency_id"=>$data["agency_id"],
@@ -140,7 +140,7 @@ class AdminController extends Controller
             );
             return response()->json([
                 "status"=>"success",
-                "response"=>$response
+                "result"=>$response
             ]);
         }
         catch (\Illuminate\Validation\ValidationException $e) {

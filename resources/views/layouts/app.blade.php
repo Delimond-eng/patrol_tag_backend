@@ -9,6 +9,7 @@
     <meta name="description" content="Icewall admin for weeding app">
     <meta name="keywords" content="Rapid Tech Property">
     <meta name="author" content="Gaston Delimond Dev">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Patrol Tag By Rapid Tech Solution</title>
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" />
@@ -42,6 +43,9 @@
 
     <!-- BEGIN: Js assets -->
     <script src="{{ asset('assets/js/app.js') }}"></script>
+    <script src="{{ asset('assets/js/libs/toastify.min.js') }}"></script>
+    <script src="{{ asset('assets/js/libs/pristine.min.js') }}"></script>
+    <script src="{{ asset('assets/js/libs/vue2.js') }}"></script>
     @yield("scripts")
     <!-- END: JS Assets-->
 </body>

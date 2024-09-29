@@ -15,10 +15,10 @@
                 </div>
                 <!-- END: Ads 1 -->
                 <!-- BEGIN: Weekly Best Sellers -->
-                <div class="col-span-12 lg:col-span-8 xl:col-span-4">
+                <div class="col-span-12 lg:col-span-12 xl:col-span-12">
                     <div class="intro-y flex items-center h-10">
                         <h2 class="text-lg font-medium truncate mr-5">
-                            Patrouilles en cours...
+                            Patrouilles en cours <i data-loading-icon="three-dots" data-color="1a202c" class="w-4 h-4 ml-2"></i>
                         </h2>
                     </div>
                 </div>

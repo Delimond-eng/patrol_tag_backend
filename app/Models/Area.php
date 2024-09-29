@@ -15,7 +15,7 @@ class Area extends Model
      *
      * @var string
      */
-    protected $table = 'agencies';
+    protected $table = 'areas';
 
     /**
      * The primary key for the model.

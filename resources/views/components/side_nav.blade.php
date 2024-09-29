@@ -8,7 +8,7 @@
         </li>
 
         <li>
-            <a href="javascript:;.html" class="side-menu {{ Route::is("site.create") ? 'side-menu--active' : '' }}">
+            <a href="javascript:;.html" class="side-menu {{ Route::is("site.create") || Route::is("sites.list") ? 'side-menu--active' : '' }}">
                 <div class="side-menu__icon"> <i data-lucide="map"></i> </div>
                 <div class="side-menu__title">
                     Gestion des sites
@@ -23,7 +23,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="" class="side-menu">
+                    <a href="{{ url("/sites.list") }}" class="side-menu">
                         <div class="side-menu__icon"> <i data-lucide="minus"></i> </div>
                         <div class="side-menu__title"> Liste des sites </div>
                     </a>
@@ -31,8 +31,7 @@
             </ul>
         </li>
         <li>
-            <a href="javascript:;.html" class="side-menu {{ Route::is("agent.create") ? 'side-menu--active' : '' }}">
-
+            <a href="javascript:;.html" class="side-menu {{ Route::is("agent.create") || Route::is("agents.list") ? 'side-menu--active' : '' }}">
                 <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
                 <div class="side-menu__title">
                     Gestion agents
@@ -47,13 +46,13 @@
                     </a>
                 </li>
                 <li>
-                    <a href="" class="side-menu">
+                    <a href="javascript:void(0);" class="side-menu">
                         <div class="side-menu__icon"> <i data-lucide="minus"></i> </div>
                         <div class="side-menu__title"> Assignation </div>
                     </a>
                 </li>
                 <li>
-                    <a href="" class="side-menu">
+                    <a href="{{ url("/agents.list") }}" class="side-menu">
                         <div class="side-menu__icon"> <i data-lucide="minus"></i> </div>
                         <div class="side-menu__title"> Liste des agents </div>
                     </a>
@@ -62,15 +61,21 @@
         </li>
 
         <li>
-            <a href="" class="side-menu">
+            <a href="javascript:void(0);" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="bar-chart-2"></i> </div>
                 <div class="side-menu__title"> Rapports patrouille </div>
             </a>
         </li>
 
         <li class="side-nav__devider my-6"></li>
+        <li>
+            <a href="" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
+                <div class="side-menu__title"> Gestion d'habilitation </div>
+            </a>
+        </li>
 
-
+        <li class="side-nav__devider my-6"></li>
         <li>
             <a href="" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="alert-circle"></i> </div>
@@ -83,7 +88,5 @@
                 <div class="side-menu__title"> Déconnexion </div>
             </a>
         </li>
-
-
     </ul>
 </nav>

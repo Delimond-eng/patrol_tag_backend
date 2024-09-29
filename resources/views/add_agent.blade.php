@@ -3,13 +3,13 @@
 @section("content")
 <!-- BEGIN: Content -->
 <div class="content">
-    <div class="intro-y flex items-center mt-8">
+    <div class="intro-x flex items-center mt-8">
         <h2 class="text-lg font-medium mr-auto">
-            Création agent
+            Création agents
         </h2>
     </div>
-    <div class="grid grid-cols-12 gap-6 mt-5">
-        <div class="intro-y col-span-12 lg:col-span-6">
+    <div class="grid grid-cols-12 gap-6 mt-5" id="App" v-cloak>
+        <div class="intro-x col-span-12 lg:col-span-7">
             <!-- BEGIN: Form Validation -->
             <div class="intro-y box">
                 <div class="flex flex-col sm:flex-row items-center p-5 border-b border-slate-200/60 dark:border-darkmode-400">
@@ -17,48 +17,59 @@
                         Renseignez tous les champs requis
                     </h2>
                 </div>
-                <div id="form-validation" class="p-5">
+                <div id="form-site" class="p-5">
                     <div class="preview">
                         <!-- BEGIN: Validation Form -->
-                        <form class="validate-form-2">
+                        <form class="form-agent" method="POST" action="{{ route("agent.create") }}" @submit.prevent="createAgent">
                             <div class="input-form">
-                                <label for="validation-form-1" class="form-label w-full flex flex-col sm:flex-row"> Name <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, at least 2 characters</span> </label>
-                                <input id="validation-form-1" type="text" name="name" class="form-control" placeholder="John Legend" minlength="2" required>
+                                <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Site affecté <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
+                                <select class="form-select w-full" v-model="form.site_id" required>
+                                    <option label="Sélectionnez un site affecté" selected hidden></option>
+                                    @foreach ($sites as $site)
+                                    <option value="{{ $site->id }}">{{ $site->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Email <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, email address format</span> </label>
-                                <input id="validation-form-2" type="email" name="email" class="form-control" placeholder="example@gmail.com" required>
+
+                            <div class="input-form mt-2">
+                                <label for="validation-form-1" class="form-label w-full flex flex-col sm:flex-row"> Matricule <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
+                                <input id="validation-form-1" v-model="form.matricule" type="text" name="matricule" class="form-control" placeholder="Entrer le n° matricule de l'agent" minlength="2" required>
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-3" class="form-label w-full flex flex-col sm:flex-row"> Password <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, at least 6 characters</span> </label>
-                                <input id="validation-form-3" type="password" name="password" class="form-control" placeholder="secret" minlength="6" required>
+                            <div class="input-form mt-2">
+                                <label for="validation-form-1" class="form-label w-full flex flex-col sm:flex-row"> Nom complet <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
+                                <input id="validation-form-1" v-model="form.fullname" type="text" name="fullname" class="form-control" placeholder="Entrer le code du site" minlength="2" required>
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-4" class="form-label w-full flex flex-col sm:flex-row"> Age <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, integer only & maximum 3 characters</span> </label>
-                                <input id="validation-form-4" type="number" name="age" class="form-control" placeholder="21" required>
+
+                            <div class="input-form mt-2">
+                                <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Mot de passe <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">(optionnel)</span> </label>
+                                <input id="validation-form-2" v-model="form.password" type="text" name="phone" class="form-control" placeholder="Entrer le mot de passe" minlength="5" required>
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-5" class="form-label w-full flex flex-col sm:flex-row"> Profile URL <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Optional, URL format</span> </label>
-                                <input id="validation-form-5" type="url" name="url" class="form-control" placeholder="https://google.com/">
-                            </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-6" class="form-label w-full flex flex-col sm:flex-row"> Comment <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, at least 10 characters</span> </label>
-                                <textarea id="validation-form-6" class="form-control" name="comment" placeholder="Type your comments" minlength="10" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary mr-2 mt-5">Register</button>
-                            <button type="button" id="btn-notify" class="btn btn-light mt-5">show notification</button>
+                            <button :disabled="isLoading" type="submit" class="btn btn-primary mt-5">Enregistrer <span v-if="isLoading"><i data-loading-icon="oval" data-color="white" class="w-4 h-4 ml-2"></i></button>
+                            <button @click.prevent="reset" type="button" class="btn btn-light mt-5">Annuler</button>
                         </form>
                         <!-- END: Validation Form -->
+
+
                         <!-- BEGIN: Success Notification Content -->
                         <div id="success-notification-content" class="toastify-content hidden flex">
                             <i class="text-success" data-lucide="check-circle"></i>
                             <div class="ml-4 mr-4">
-                                <div class="font-medium">Registration success!</div>
-                                <div class="text-slate-500 mt-1"> Please check your e-mail for further info! </div>
+                                <div class="font-medium">Opération effectuée !</div>
+                                <div class="text-slate-500 mt-1"> la création de l'agent effectuée avec succès! </div>
                             </div>
                         </div>
                         <!-- END: Success Notification Content -->
 
+
+                        <!-- BEGIN: Failed Notification Content -->
+                        <div id="failed-notification-content" class="toastify-content hidden flex">
+                            <i class="text-danger" data-lucide="x-circle"></i>
+                            <div class="ml-4 mr-4">
+                                <div class="font-medium">Echec de traitement de la requête!</div>
+                                <div class="text-slate-500 mt-1" v-if="error">@{{ error }} </div>
+                            </div>
+                        </div>
+                        <!-- END: Failed Notification Content -->
                     </div>
 
                 </div>
@@ -66,32 +77,18 @@
             <!-- END: Form Validation -->
         </div>
     </div>
-</div>
-<!-- BEGIN: Failed Notification Content -->
-<div id="failed-notification-content" class="toastify-content hidden flex">
-    <i class="text-danger" data-lucide="x-circle"></i>
-    <div class="ml-4 mr-4">
-        <div class="font-medium">Registration failed!</div>
-        <div class="text-slate-500 mt-1"> Please check the fileld form. </div>
+    <div class="h-full flex items-center" id="loader">
+        <div class="mx-auto text-center">
+            <div>
+                Chargement en cours...
+            </div>
+        </div>
     </div>
-</div>
-<!-- END: Failed Notification Content -->
 
+</div>
 <!-- END: Content -->
-<!-- BEGIN: Notification Content -->
-<div id="test-notify" class="toastify-content hidden flex"> <i data-lucide="hard-drive"></i>
-    <div class="ml-4 mr-4">
-        <div class="font-medium">Storage Removed!</div>
-        <div class="text-slate-500 mt-1">The server will restart in 30 seconds, don't make<br> changes during the update process!</div>
-        <div class="font-medium flex mt-1.5"> <a class="text-primary dark:text-slate-400" href="">Restart Now</a> <a class="text-slate-500 ml-3" href="">Cancel</a> </div>
-    </div>
-</div>
-<!-- END: Notification Content -->
-
 @endsection
 
 @section("scripts")
-<script src=" https://cdn.jsdelivr.net/npm/pristinejs@1.1.0/dist/pristine.min.js "></script>
-<script src=" https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js "></script>
-<script src="{{ asset("assets/js/test.js") }}"></script>
+<script type="module" src="{{ asset("assets/js/scripts/agent_manager.js") }}"></script>
 @endsection

@@ -3,13 +3,13 @@
 @section("content")
 <!-- BEGIN: Content -->
 <div class="content">
-    <div class="intro-y flex items-center mt-8">
+    <div class="intro-x flex items-center mt-8">
         <h2 class="text-lg font-medium mr-auto">
             Création site + zones de patrouille
         </h2>
     </div>
-    <div class="grid grid-cols-12 gap-6 mt-5">
-        <div class="intro-y col-span-12 lg:col-span-6">
+    <div class="grid grid-cols-12 gap-6 mt-5" id="App" v-cloak>
+        <div class="intro-x col-span-12 lg:col-span-7">
             <!-- BEGIN: Form Validation -->
             <div class="intro-y box">
                 <div class="flex flex-col sm:flex-row items-center p-5 border-b border-slate-200/60 dark:border-darkmode-400">
@@ -17,43 +17,53 @@
                         Renseignez tous les champs requis
                     </h2>
                 </div>
-                <div id="form-validation" class="p-5">
+                <div id="form-site" class="p-5">
                     <div class="preview">
                         <!-- BEGIN: Validation Form -->
-                        <form class="validate-form">
+                        <form class="form-site" method="POST" action="{{ route("site.create") }}" @submit.prevent="createSite">
                             <div class="input-form">
-                                <label for="validation-form-1" class="form-label w-full flex flex-col sm:flex-row"> Name <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, at least 2 characters</span> </label>
-                                <input id="validation-form-1" type="text" name="name" class="form-control" placeholder="John Legend" minlength="2" required>
+                                <label for="validation-form-1" class="form-label w-full flex flex-col sm:flex-row"> Nom du site <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
+                                <input id="validation-form-1" v-model="form.name" type="text" name="name" class="form-control" placeholder="Entrer le nom du site" minlength="2" required>
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Email <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, email address format</span> </label>
-                                <input id="validation-form-2" type="email" name="email" class="form-control" placeholder="example@gmail.com" required>
+                            <div class="input-form mt-2">
+                                <label for="validation-form-1" class="form-label w-full flex flex-col sm:flex-row"> Code du site <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
+                                <input id="validation-form-1" v-model="form.code" type="text" name="code" class="form-control" placeholder="Entrer le code du site" minlength="2" required>
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-3" class="form-label w-full flex flex-col sm:flex-row"> Password <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, at least 6 characters</span> </label>
-                                <input id="validation-form-3" type="password" name="password" class="form-control" placeholder="secret" minlength="6" required>
+
+                            <div class="input-form mt-2">
+                                <label for="validation-form-6" class="form-label w-full flex flex-col sm:flex-row"> Adresse <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
+                                <textarea id="validation-form-6" v-model="form.adresse" class="form-control" name="adresse" placeholder="N°xx, Q.xx, C.xxxxxx" minlength="10" required></textarea>
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-4" class="form-label w-full flex flex-col sm:flex-row"> Age <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, integer only & maximum 3 characters</span> </label>
-                                <input id="validation-form-4" type="number" name="age" class="form-control" placeholder="21" required>
+
+                            <div class="input-form mt-2">
+                                <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Téléphone <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">(optionnel)</span> </label>
+                                <input id="validation-form-2" v-model="form.phone" type="tel" name="phone" class="form-control" placeholder="+(243)xx xxx xxx" minlength="10">
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-5" class="form-label w-full flex flex-col sm:flex-row"> Profile URL <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Optional, URL format</span> </label>
-                                <input id="validation-form-5" type="url" name="url" class="form-control" placeholder="https://google.com/">
+
+                            <h2 class="font-medium text-base text-primary mr-auto mt-3">
+                                Zones de patrouille *
+                            </h2>
+                            <div class="input-form mt-2" v-for="(data, index) in form.areas" :key="index">
+                                <label for="validation-form-3" class="form-label w-full flex flex-col sm:flex-row"> Libellé *
+                                    <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-primary" v-if="index===0">
+                                        <a href="javascript:void(0);" @click.prevent="form.areas.push({libelle:''})">Ajouter</a>
+                                    </span>
+                                    <span v-else class="sm:ml-auto mt-1 sm:mt-0 text-xs text-red-500">
+                                        <a href="javascript:void(0);" @click.prevent="form.areas.splice(index,1)">Reduire</a>
+                                    </span>
+                                </label>
+                                <input id="validation-form-3" v-model="data.libelle" type="text" name="libelle" class="form-control" placeholder="Saisir le libellé de la zone..." required>
                             </div>
-                            <div class="input-form mt-3">
-                                <label for="validation-form-6" class="form-label w-full flex flex-col sm:flex-row"> Comment <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">Required, at least 10 characters</span> </label>
-                                <textarea id="validation-form-6" class="form-control" name="comment" placeholder="Type your comments" minlength="10" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary mt-5">Register</button>
+                            <button :disabled="isLoading" type="submit" class="btn btn-primary mt-5">Enregistrer <span v-if="isLoading"><i data-loading-icon="oval" data-color="white" class="w-4 h-4 ml-2"></i></button>
+                            <button @click.prevent="reset" type="button" class="btn btn-light mt-5">Annuler</button>
                         </form>
                         <!-- END: Validation Form -->
                         <!-- BEGIN: Success Notification Content -->
                         <div id="success-notification-content" class="toastify-content hidden flex">
                             <i class="text-success" data-lucide="check-circle"></i>
                             <div class="ml-4 mr-4">
-                                <div class="font-medium">Registration success!</div>
-                                <div class="text-slate-500 mt-1"> Please check your e-mail for further info! </div>
+                                <div class="font-medium">Opération effectuée !</div>
+                                <div class="text-slate-500 mt-1"> la création d'un nouveau site de patrouille effectuée ! </div>
                             </div>
                         </div>
                         <!-- END: Success Notification Content -->
@@ -61,24 +71,31 @@
                         <div id="failed-notification-content" class="toastify-content hidden flex">
                             <i class="text-danger" data-lucide="x-circle"></i>
                             <div class="ml-4 mr-4">
-                                <div class="font-medium">Registration failed!</div>
-                                <div class="text-slate-500 mt-1"> Please check the fileld form. </div>
+                                <div class="font-medium">Echec de traitement de la requête!</div>
+                                <div class="text-slate-500 mt-1" v-if="error">@{{ error }} </div>
                             </div>
                         </div>
                         <!-- END: Failed Notification Content -->
                     </div>
-                    <div class="source-code hidden">
-                        <button data-target="#copy-form-validation" class="copy-code btn py-1 px-2 btn-outline-secondary"> <i data-lucide="file" class="w-4 h-4 mr-2"></i> Copy example code </button>
-                        <div class="overflow-y-auto mt-3 rounded-md">
-                            <pre id="copy-form-validation" class="source-preview"> <code class="html"> HTMLOpenTag!-- BEGIN: Validation Form --HTMLCloseTag HTMLOpenTagform class=&quot;validate-form&quot;HTMLCloseTag HTMLOpenTagdiv class=&quot;input-form&quot;HTMLCloseTag HTMLOpenTaglabel for=&quot;validation-form-1&quot; class=&quot;form-label w-full flex flex-col sm:flex-row&quot;HTMLCloseTag Name HTMLOpenTagspan class=&quot;sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500&quot;HTMLCloseTagRequired, at least 2 charactersHTMLOpenTag/spanHTMLCloseTag HTMLOpenTag/labelHTMLCloseTag HTMLOpenTaginput id=&quot;validation-form-1&quot; type=&quot;text&quot; name=&quot;name&quot; class=&quot;form-control&quot; placeholder=&quot;John Legend&quot; minlength=&quot;2&quot; requiredHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;input-form mt-3&quot;HTMLCloseTag HTMLOpenTaglabel for=&quot;validation-form-2&quot; class=&quot;form-label w-full flex flex-col sm:flex-row&quot;HTMLCloseTag Email HTMLOpenTagspan class=&quot;sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500&quot;HTMLCloseTagRequired, email address formatHTMLOpenTag/spanHTMLCloseTag HTMLOpenTag/labelHTMLCloseTag HTMLOpenTaginput id=&quot;validation-form-2&quot; type=&quot;email&quot; name=&quot;email&quot; class=&quot;form-control&quot; placeholder=&quot;example@gmail.com&quot; requiredHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;input-form mt-3&quot;HTMLCloseTag HTMLOpenTaglabel for=&quot;validation-form-3&quot; class=&quot;form-label w-full flex flex-col sm:flex-row&quot;HTMLCloseTag Password HTMLOpenTagspan class=&quot;sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500&quot;HTMLCloseTagRequired, at least 6 charactersHTMLOpenTag/spanHTMLCloseTag HTMLOpenTag/labelHTMLCloseTag HTMLOpenTaginput id=&quot;validation-form-3&quot; type=&quot;password&quot; name=&quot;password&quot; class=&quot;form-control&quot; placeholder=&quot;secret&quot; minlength=&quot;6&quot; requiredHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;input-form mt-3&quot;HTMLCloseTag HTMLOpenTaglabel for=&quot;validation-form-4&quot; class=&quot;form-label w-full flex flex-col sm:flex-row&quot;HTMLCloseTag Age HTMLOpenTagspan class=&quot;sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500&quot;HTMLCloseTagRequired, integer only &amp; maximum 3 charactersHTMLOpenTag/spanHTMLCloseTag HTMLOpenTag/labelHTMLCloseTag HTMLOpenTaginput id=&quot;validation-form-4&quot; type=&quot;number&quot; name=&quot;age&quot; class=&quot;form-control&quot; placeholder=&quot;21&quot; requiredHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;input-form mt-3&quot;HTMLCloseTag HTMLOpenTaglabel for=&quot;validation-form-5&quot; class=&quot;form-label w-full flex flex-col sm:flex-row&quot;HTMLCloseTag Profile URL HTMLOpenTagspan class=&quot;sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500&quot;HTMLCloseTagOptional, URL formatHTMLOpenTag/spanHTMLCloseTag HTMLOpenTag/labelHTMLCloseTag HTMLOpenTaginput id=&quot;validation-form-5&quot; type=&quot;url&quot; name=&quot;url&quot; class=&quot;form-control&quot; placeholder=&quot;https://google.com&quot;HTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;input-form mt-3&quot;HTMLCloseTag HTMLOpenTaglabel for=&quot;validation-form-6&quot; class=&quot;form-label w-full flex flex-col sm:flex-row&quot;HTMLCloseTag Comment HTMLOpenTagspan class=&quot;sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500&quot;HTMLCloseTagRequired, at least 10 charactersHTMLOpenTag/spanHTMLCloseTag HTMLOpenTag/labelHTMLCloseTag HTMLOpenTagtextarea id=&quot;validation-form-6&quot; class=&quot;form-control&quot; name=&quot;comment&quot; placeholder=&quot;Type your comments&quot; minlength=&quot;10&quot; requiredHTMLCloseTagHTMLOpenTag/textareaHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagbutton type=&quot;submit&quot; class=&quot;btn btn-primary mt-5&quot;HTMLCloseTagRegisterHTMLOpenTag/buttonHTMLCloseTag HTMLOpenTag/formHTMLCloseTag HTMLOpenTag!-- END: Validation Form --HTMLCloseTag HTMLOpenTag!-- BEGIN: Success Notification Content --HTMLCloseTag HTMLOpenTagdiv id=&quot;success-notification-content&quot; class=&quot;toastify-content hidden flex&quot; HTMLCloseTag HTMLOpenTagi class=&quot;text-success&quot; data-lucide=&quot;check-circle&quot;HTMLCloseTagHTMLOpenTag/iHTMLCloseTag HTMLOpenTagdiv class=&quot;ml-4 mr-4&quot;HTMLCloseTag HTMLOpenTagdiv class=&quot;font-medium&quot;HTMLCloseTagRegistration success!HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;text-slate-500 mt-1&quot;HTMLCloseTag Please check your e-mail for further info! HTMLOpenTag/divHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTag!-- END: Success Notification Content --HTMLCloseTag HTMLOpenTag!-- BEGIN: Failed Notification Content --HTMLCloseTag HTMLOpenTagdiv id=&quot;failed-notification-content&quot; class=&quot;toastify-content hidden flex&quot; HTMLCloseTag HTMLOpenTagi class=&quot;text-danger&quot; data-lucide=&quot;x-circle&quot;HTMLCloseTagHTMLOpenTag/iHTMLCloseTag HTMLOpenTagdiv class=&quot;ml-4 mr-4&quot;HTMLCloseTag HTMLOpenTagdiv class=&quot;font-medium&quot;HTMLCloseTagRegistration failed!HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;text-slate-500 mt-1&quot;HTMLCloseTag Please check the fileld form. HTMLOpenTag/divHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTag!-- END: Failed Notification Content --HTMLCloseTag </code> </pre>
-                        </div>
-                    </div>
+
                 </div>
             </div>
             <!-- END: Form Validation -->
         </div>
     </div>
+
+    <div class="h-full flex items-center" id="loader">
+        <div class="mx-auto text-center">
+            <div>
+                Chargement en cours...
+            </div>
+        </div>
+    </div>
+
 </div>
 <!-- END: Content -->
+@endsection
 
+@section("scripts")
+<script type="module" src="{{ asset("assets/js/scripts/areas_manager.js") }}"></script>
 @endsection

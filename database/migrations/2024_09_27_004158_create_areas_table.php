@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('areas', function (Blueprint $table) {
             $table->id();
             $table->string("libelle");
-            $table->string("latlng");
-            $table->string("qrcode");
+            $table->string("latlng")->nullable();
+            $table->string("qrcode")->nullable();
             $table->unsignedBigInteger("site_id");
             $table->string("status")->default("actif");
             $table->timestamps();

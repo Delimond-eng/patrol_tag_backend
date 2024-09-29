@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Models\Site;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -18,24 +20,27 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name("dashboard");
 
 Route::get('/agent.create', function () {
-    return view('add_agent');
+    $sites = Site::where("status", "actif")->get();
+    return view('add_agent',[
+        "sites"=>$sites
+    ]);
 })->name('agent.create');
+
+Route::get('/agents.list', function () {
+    return view('agent_list');
+})->name('agents.list');
+
+Route::get('/sites.list', function () {
+    return view('site_list');
+})->name('sites.list');
 
 Route::get('/site.create', function () {
     return view('add_site_area');
 })->name('site.create');
 
-Route::get('/profile', function () {
-    return view('profile');
-})->name("profile");
+Route::post("site.create", [AdminController::class, "createAgencieSite"])->name("site.create");
+Route::post("agent.create", [AdminController::class, "createAgent"])->name("agent.create");
 
 
-Route::get('/forms', function () {
-    return view('forms');
-})->name("forms");
-
-Route::get('/subscribe', function () {
-    return view('subscribe');
-})->name("subscribe");
 
 Auth::routes();
