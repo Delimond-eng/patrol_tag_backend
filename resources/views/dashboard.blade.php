@@ -27,23 +27,27 @@
                     <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3">
                         @for ($i=0; $i<6; $i++) <div class="intro-y">
                             <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
-                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
-                                    <img alt="Patrol Tag" src="assets/images/patrol.gif">
+                                <div class="w-10 h-10 flex-none overflow-hidden">
+                                    <img alt="Patrol Tag" src="assets/images/security.svg">
                                 </div>
                                 <div class="ml-4 mr-auto">
                                     <div class="font-medium">SITE : Moero nord</div>
                                     <div class="text-slate-500 text-xs mt-0.5">AGENT : Gaston Delimond</div>
                                 </div>
-                                <div class="py-1 px-2 rounded-md text-xs bg-slate-500 text-white cursor-pointer font-medium">2 areas</div>
+                                <div class="py-1 px-2 rounded-md text-xs bg-slate-500 text-white cursor-pointer font-medium">
+                                    1
+                                </div>
                             </div>
                     </div>
                     @endfor
                 </div>
-
             </div>
         </div>
     </div>
+</div>
+</div>
+@endsection
 
-</div>
-</div>
+@section("scripts")
+<script src="{{ asset("assets/js/scripts/notification_manager.js") }}"></script>
 @endsection

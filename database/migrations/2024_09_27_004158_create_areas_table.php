@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string("libelle");
             $table->string("latlng")->nullable();
-            $table->string("qrcode")->nullable();
+            $table->text("qrcode")->nullable();
             $table->unsignedBigInteger("site_id");
             $table->string("status")->default("actif");
             $table->timestamps();

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Area;
 use App\Models\Patrol;
 use App\Models\PatrolScan;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AppManagerController extends Controller
 {
@@ -19,30 +21,92 @@ class AppManagerController extends Controller
      */
     public function startPatrol(Request $request) : JsonResponse
     {
-        try{
+        try {
             $data = $request->validate([
-                "site_id"=>"required|int|exists:sites,id",
-                "agent_id"=>"required|int|exists:agents,id",
-                "agency_id"=>"required|int|exists:agencies,id",
+                "patrol_id" => "nullable|int|exists:patrols,id",
+                "site_id"   => "required_if:patrol_id,null|int|exists:sites,id",
+                "agency_id" => "required_if:patrol_id,null|int|exists:agencies,id",
+                "scan.agent_id" => "required|int|exists:agents,id",   // Correction pour la validation des champs imbriqués
+                "scan.area_id"  => "required|int|exists:areas,id",    // Correction pour la validation des champs imbriqués
+                "scan.comment"  => "nullable|string",
+                "scan.latlng"   => "required|string"                  // Correction pour la validation des champs imbriqués
             ]);
+
+            $scan = $data["scan"];
+            $area = Area::find($scan['area_id']);
+
+            // Extraction des coordonnées GPS de la zone et du scan
+            list($areaLat, $areaLng) = explode(':', $area->latlng ?? "8844757:30934949");
+            list($scanLat, $scanLng) = explode(':', $scan['latlng']);
+
+            // Calcul de la distance en mètres entre les deux points GPS
+            $distance = $this->calculateDistance($areaLat, $areaLng, $scanLat, $scanLng);
+            $tolerance = 1; // Tolérance de distance en mètres
+
+            // Mise à jour du statut du scan en fonction de la distance
+            $scan['status'] = ($distance <= $tolerance) ? "success" : "fail";
+            $scan['distance'] = "{$distance} m";
+
+            // Si la patrouille existe, on ajoute le scan
+            if (!empty($data['patrol_id'])) {
+                $scan["patrol_id"] = $data["patrol_id"];
+                $response = PatrolScan::create($scan);
+
+                return response()->json([
+                    "status" => "success",
+                    "result" => $response
+                ]);
+            }
+
+            // Sinon, on démarre une nouvelle patrouille
             $now = Carbon::now();
             $data["started_at"] = $now->toDateTimeString();
             $data["status"] = "pending";
-            $response = Patrol::create(
-                $data
-            );
-            return response()->json([
-                "status" => "sucess",
-                "response" => $response
-            ]);
-        }
+            $data["agent_id"] = $scan["agent_id"];
+
+            $patrol = Patrol::create($data);
+
+            if ($patrol) {
+                $scan["patrol_id"] = $patrol->id;
+                PatrolScan::create($scan);
+
+                return response()->json([
+                    "status" => "success",
+                    "result" => $patrol
+                ]);
+            }
+        } 
         catch (\Illuminate\Validation\ValidationException $e) {
-            $errors = $e->validator->errors()->all();
-            return response()->json(['errors' => $errors ]);
+            return response()->json(['errors' => $e->validator->errors()->all()], 400);
         }
-        catch (\Illuminate\Database\QueryException $e){
-            return response()->json(['errors' => $e->getMessage() ]);
+        catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['errors' => $e->getMessage()], 500);
         }
+
+        return response()->json([
+            "errors" => "Echec de traitement de la requête !"
+        ], 500);
+    }
+
+
+
+    /**
+     * View all pending Patrol
+     * @return JsonResponse
+    */
+    public function viewPendingPatrols(){
+        $agencyId = Auth::user()->agency_id;
+        $patrols = Patrol::with("site.areas")
+            ->with("agent")
+            ->with("scans.agent")
+            ->with("scans.area")
+            ->where("status", "pending")
+            ->where("agency_id", $agencyId)
+            ->get();
+        return response()->json([
+            "status"=>"success",
+            "pending_patrols"=>$patrols
+        ]);
     }
 
 
@@ -154,6 +218,63 @@ class AppManagerController extends Controller
         $distance = $earthRadius * $c;
         return $distance; // Distance en mètres
     }
+
+
+
+    /**
+     * Allow to delete some data 
+     * It change the status of tuple to deleted
+    */
+    public function triggerDelete(Request $request):JsonResponse
+    {
+        try {
+            $data = $request->validate([
+                'table'=>'required|string',
+                'id'=>'required|int'
+            ]);
+            
+            $result = DB::table($data['table'])
+                ->where('id', $data['id'])
+                ->update(['status' => 'deleted']);
+            return response()->json([
+                "status"=>"success",
+                "result"=>$result
+            ]);
+        }
+        catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            return response()->json(['errors' => $errors ]);
+        }
+        catch (\Illuminate\Database\QueryException $e){
+            return response()->json(['errors' => $e->getMessage() ]);
+        }
+    }
+
+
+    /**
+     * Test generate PDF
+     * @param int|null $eventID
+     * @return Response
+     */
+    public function generatePdfWithQRCodes(int $siteId)
+    {
+        // Récupérer les zones actives pour un site donné
+        $areas = Area::where("site_id", $siteId)
+                    ->where("status", "actif")
+                    ->get(); // Utilisez get() pour exécuter la requête et récupérer les données
+
+        // Vérifier si des zones existent pour éviter de générer un PDF vide
+        $data = ['areas' => $areas];
+
+        // Générer le PDF avec la vue Blade
+        $pdf = Pdf::loadView('pdf.invoice', $data)
+                ->setPaper('a4')
+                ->setOption('margin-top', 10);
+
+        // Télécharger le fichier PDF
+        return $pdf->download('areas_qrcodes_printing_'.$siteId.'.pdf');
+    }
+
 
 
 

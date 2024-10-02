@@ -7,7 +7,10 @@ new Vue({
             result: null,
             isLoading: false,
             pristine: null,
+            agents: [],
+            search: '',
             form: {
+                id: "",
                 matricule: "",
                 fullname: "",
                 password: "",
@@ -19,14 +22,16 @@ new Vue({
     mounted() {
         // Une fois que Vue.js est chargé, on cache le loader
         document.getElementById('loader').style.display = 'none';
-
         //init pristine script
-        this.pristine = new Pristine(document.querySelector(".form-agent"), {
-            classTo: "input-form",
-            errorClass: "has-error",
-            errorTextParent: "input-form",
-            errorTextClass: "text-danger mt-2"
-        });
+        if (document.querySelector(".form-agent") !== null) {
+            this.pristine = new Pristine(document.querySelector(".form-agent"), {
+                classTo: "input-form",
+                errorClass: "has-error",
+                errorTextParent: "input-form",
+                errorTextClass: "text-danger mt-2"
+            });
+        }
+        this.viewAllAgents();
     },
 
     methods: {
@@ -53,6 +58,7 @@ new Vue({
                                     stopOnFocus: true
                                 }).showToast();
                             }, 100)
+
                         }
                         if (data.result) {
                             console.log(data.result);
@@ -67,6 +73,10 @@ new Vue({
                                 position: "right",
                                 stopOnFocus: true
                             }).showToast();
+                            this.viewAllAgents();
+                            if (document.querySelector("#btn-reset") !== null) {
+                                document.querySelector("#btn-reset").click()
+                            }
                             // clean fields
                             this.reset();
                         }
@@ -74,15 +84,6 @@ new Vue({
                     .catch((err) => {
                         this.isLoading = false;
                         this.error = err;
-                        new Toastify({
-                            node: $("#failed-notification-content").clone().removeClass("hidden")[0],
-                            duration: 3000,
-                            newWindow: true,
-                            close: true,
-                            gravity: "top",
-                            position: "right",
-                            stopOnFocus: true
-                        }).showToast();
                     });
             }
 
@@ -95,8 +96,33 @@ new Vue({
                 password: "",
                 site_id: ""
             }
-        }
+        },
+
+        viewAllAgents() {
+            get("/agents")
+                .then((res) => {
+                    this.agents = res.data.agents;
+                })
+                .catch((err) => console.log("error"));
+        },
 
 
     },
+
+
+    computed: {
+        allAgents() {
+            if (this.search && this.search.trim()) {
+                return this.agents.filter((el) =>
+                    el.fullname
+                    .toLowerCase()
+                    .includes(this.search.toLowerCase()) || el.matricule
+                    .toLowerCase()
+                    .includes(this.search.toLowerCase())
+                );
+            } else {
+                return this.agents;
+            }
+        }
+    }
 });

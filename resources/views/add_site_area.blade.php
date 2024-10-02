@@ -54,7 +54,7 @@
                                 </label>
                                 <input id="validation-form-3" v-model="data.libelle" type="text" name="libelle" class="form-control" placeholder="Saisir le libellé de la zone..." required>
                             </div>
-                            <button :disabled="isLoading" type="submit" class="btn btn-primary mt-5">Enregistrer <span v-if="isLoading"><i data-loading-icon="oval" data-color="white" class="w-4 h-4 ml-2"></i></button>
+                            <button :disabled="isLoading" type="submit" class="btn btn-primary mt-5">Enregistrer <span v-if="isLoading"><i data-loading-icon="oval" data-color="white" class="w-4 h-4 ml-2"></i> </span></button>
                             <button @click.prevent="reset" type="button" class="btn btn-light mt-5">Annuler</button>
                         </form>
                         <!-- END: Validation Form -->
@@ -87,7 +87,7 @@
     <div class="h-full flex items-center" id="loader">
         <div class="mx-auto text-center">
             <div>
-                Chargement en cours...
+                <img src="{{ asset('assets/images/loading.gif') }}" class="w-12 h-12" />
             </div>
         </div>
     </div>

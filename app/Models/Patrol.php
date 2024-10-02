@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Patrol extends Model
 {
@@ -36,6 +37,7 @@ class Patrol extends Model
         "comment_audio",
         "site_id",
         "agent_id",
+        "agency_id",
         "status",
     ];
 
@@ -71,6 +73,14 @@ class Patrol extends Model
         'updated_at',
     ];
 
+    /**
+     * Has many scans
+     * @return HasMany
+    */
+    public function scans():HasMany{
+        return $this->hasMany(PatrolScan::class, foreignKey:"patrol_id", localKey:"id");
+    }
+
 
     /**
      * Belong to site
@@ -78,5 +88,14 @@ class Patrol extends Model
     */
     public function site() : BelongsTo{
         return $this->belongsTo(Site::class, foreignKey:"site_id",);
+    }
+
+
+    /**
+     * Belongs to Agent
+     * @return BelongsTo
+    */
+    public function agent() : BelongsTo{
+        return $this->belongsTo(Agent::class, foreignKey:"agent_id",);
     }
 }

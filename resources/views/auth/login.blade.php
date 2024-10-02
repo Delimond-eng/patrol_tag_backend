@@ -66,7 +66,7 @@
         <div class="h-full flex items-center" id="loader">
             <div class="mx-auto text-center">
                 <div>
-                    Chargement en cours...
+                    <img src="{{ asset('assets/images/loading.gif') }}" class="w-12 h-12" />
                 </div>
             </div>
         </div>

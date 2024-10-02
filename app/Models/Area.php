@@ -33,7 +33,7 @@ class Area extends Model
         "libelle",
         "latlng",
         "qrcode",
-        "site_id"
+        "site_id",
     ];
 
     /**

@@ -46,12 +46,6 @@
                     </a>
                 </li>
                 <li>
-                    <a href="javascript:void(0);" class="side-menu">
-                        <div class="side-menu__icon"> <i data-lucide="minus"></i> </div>
-                        <div class="side-menu__title"> Assignation </div>
-                    </a>
-                </li>
-                <li>
                     <a href="{{ url("/agents.list") }}" class="side-menu">
                         <div class="side-menu__icon"> <i data-lucide="minus"></i> </div>
                         <div class="side-menu__title"> Liste des agents </div>

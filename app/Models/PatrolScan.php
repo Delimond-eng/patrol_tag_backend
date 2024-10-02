@@ -37,6 +37,7 @@ class PatrolScan extends Model
         "distance",
         "agent_id",
         "patrol_id",
+        "area_id"
     ];
 
     /**
@@ -57,7 +58,6 @@ class PatrolScan extends Model
     protected $casts = [
         'created_at'=>'datetime:d/m/Y H:i',
         'updated_at'=>'datetime:d/m/Y H:i',
-        'time'=>'datetime:H:i',
     ];
 
     /**
@@ -68,7 +68,6 @@ class PatrolScan extends Model
     protected $dates = [
         'created_at',
         'updated_at',
-        'time'
     ];
 
 
@@ -87,5 +86,14 @@ class PatrolScan extends Model
     */
     public function agent() : BelongsTo{
         return $this->belongsTo(Agent::class, foreignKey:"agent_id",);
+    }
+
+
+    /**
+     * Belongs To Area
+     * @return BelongsTo
+    */
+    public function area():BelongsTo  {
+        return $this->belongsTo(Area::class, foreignKey:"area_id");
     }
 }

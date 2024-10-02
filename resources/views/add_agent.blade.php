@@ -41,7 +41,7 @@
                             </div>
 
                             <div class="input-form mt-2">
-                                <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Mot de passe <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">(optionnel)</span> </label>
+                                <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Mot de passe <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
                                 <input id="validation-form-2" v-model="form.password" type="text" name="phone" class="form-control" placeholder="Entrer le mot de passe" minlength="5" required>
                             </div>
                             <button :disabled="isLoading" type="submit" class="btn btn-primary mt-5">Enregistrer <span v-if="isLoading"><i data-loading-icon="oval" data-color="white" class="w-4 h-4 ml-2"></i></button>
@@ -80,7 +80,7 @@
     <div class="h-full flex items-center" id="loader">
         <div class="mx-auto text-center">
             <div>
-                Chargement en cours...
+                <img src="{{ asset('assets/images/loading.gif') }}" class="w-12 h-12" />
             </div>
         </div>
     </div>

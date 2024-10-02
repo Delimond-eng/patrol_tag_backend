@@ -13,6 +13,7 @@
     <title>Patrol Tag By Rapid Tech Solution</title>
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/js/libs/sweetalert2/sweetalert2.min.css') }}" />
     <!-- END: CSS Assets-->
 </head>
 <!-- BEGIN: JS Assets-->
@@ -45,7 +46,11 @@
     <script src="{{ asset('assets/js/app.js') }}"></script>
     <script src="{{ asset('assets/js/libs/toastify.min.js') }}"></script>
     <script src="{{ asset('assets/js/libs/pristine.min.js') }}"></script>
+    <script src="{{ asset('assets/js/libs/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('assets/js/libs/vue2.js') }}"></script>
+    {{-- For pusher notification  --}}
+    <script src="{{ asset('assets/js/libs/pusher.min.js') }}"></script>
+    <script type="module" src="{{ asset('assets/js/modules/pusher.init.js') }}"></script>
     @yield("scripts")
     <!-- END: JS Assets-->
 </body>

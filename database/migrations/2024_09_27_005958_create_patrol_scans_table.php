@@ -15,12 +15,13 @@ return new class extends Migration
     {
         Schema::create('patrol_scans', function (Blueprint $table) {
             $table->id();
-            $table->timestamp("time")->nullable();
+            $table->timestamp("time")->useCurrent();
             $table->string("latlng");
             $table->string("distance");
             $table->string("comment")->nullable();
             $table->string("status")->default("actif");
             $table->unsignedBigInteger("agent_id");
+            $table->unsignedBigInteger("area_id");
             $table->unsignedBigInteger("patrol_id");
             $table->timestamps();
         });
