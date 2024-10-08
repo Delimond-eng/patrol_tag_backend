@@ -31,7 +31,7 @@
             </ul>
         </li>
         <li>
-            <a href="javascript:;.html" class="side-menu {{ Route::is("agent.create") || Route::is("agents.list") ? 'side-menu--active' : '' }}">
+            <a href="javascript:;" class="side-menu {{ Route::is("agent.create") || Route::is("agents.list") ? 'side-menu--active' : '' }}">
                 <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
                 <div class="side-menu__title">
                     Gestion agents
@@ -55,9 +55,15 @@
         </li>
 
         <li>
-            <a href="javascript:void(0);" class="side-menu">
+            <a href="{{ url("/reports") }}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="bar-chart-2"></i> </div>
                 <div class="side-menu__title"> Rapports patrouille </div>
+            </a>
+        </li>
+        <li>
+            <a href="{{url("/announces")}}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="twitch"></i> </div>
+                <div class="side-menu__title"> Communiqués </div>
             </a>
         </li>
 

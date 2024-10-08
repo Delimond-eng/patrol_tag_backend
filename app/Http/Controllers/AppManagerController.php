@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agent;
+use App\Models\Announce;
 use App\Models\Area;
 use App\Models\Patrol;
 use App\Models\PatrolScan;
@@ -46,11 +48,15 @@ class AppManagerController extends Controller
             // Mise à jour du statut du scan en fonction de la distance
             $scan['status'] = ($distance <= $tolerance) ? "success" : "fail";
             $scan['distance'] = "{$distance} m";
+            $patrolId = $data['patrol_id'];
 
             // Si la patrouille existe, on ajoute le scan
-            if (!empty($data['patrol_id'])) {
+            if ($patrolId) {
                 $scan["patrol_id"] = $data["patrol_id"];
-                $response = PatrolScan::create($scan);
+                $response = PatrolScan::updateOrCreate([
+                    "patrol_id"=>$scan["patrol_id"],
+                    "area_id"=>$scan["area_id"]
+                ],$scan);
 
                 return response()->json([
                     "status" => "success",
@@ -75,7 +81,7 @@ class AppManagerController extends Controller
                     "result" => $patrol
                 ]);
             }
-        } 
+        }
         catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->validator->errors()->all()], 400);
         }
@@ -88,26 +94,105 @@ class AppManagerController extends Controller
         ], 500);
     }
 
+    /**
+     * Login agent
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function createAnnounce(Request $request) {
+        try {
+            // Validation des données
+            $data = $request->validate([
+                "title" => "required|string",
+                "content" => "required|string",
+                "site_id"=>"nullable|int|exists:sites,id"
+            ]);
+            $data["agency_id"]= Auth::user()->agency_id;
+            $response = Announce::create($data);
+
+            if($response){
+                return response()->json([
+                    "status"=>"success",
+                    "result"=>$response
+                ]);
+            }else{
+                return response()->json(['errors' => 'Echec du traitement de la requête !'],);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            return response()->json(['errors' => $errors], );
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['errors' => $e->getMessage()], );
+        }
+    }
+
+
+    /**
+     * Allow to load announces from mobile by agent
+     * @param int $siteId
+     * @return JsonResponse
+    */
+    public function loadAnnouncesFromMobile(Request $request):JsonResponse{
+        $siteId = $request->query("site_id");
+        $agencyId = $request->query("agency_id");
+        $announces = Announce::with("site")
+                ->where("site_id", $siteId)
+                ->orWhere("site_id", null)
+                ->where("agency_id", $agencyId)
+                ->where("status", "actif")
+                ->orderByDesc("id")
+                ->get();
+        return response()->json([
+            "status"=>"success",
+            "announces"=>$announces
+        ]);
+    }
+
 
 
     /**
      * View all pending Patrol
      * @return JsonResponse
     */
-    public function viewPendingPatrols(){
-        $agencyId = Auth::user()->agency_id;
+    public function viewPendingPatrols():JsonResponse{
+        $agencyId = Auth::user()->agency_id ?? 1;
         $patrols = Patrol::with("site.areas")
             ->with("agent")
             ->with("scans.agent")
             ->with("scans.area")
             ->where("status", "pending")
             ->where("agency_id", $agencyId)
+            ->orderByDesc("id")
             ->get();
         return response()->json([
             "status"=>"success",
             "pending_patrols"=>$patrols
         ]);
     }
+
+
+    /**
+     * View all Patrol reports
+     * @return JsonResponse
+    */
+    public function viewPatrolReports():JsonResponse{
+        $agencyId = Auth::user()->agency_id ?? 1;
+        $patrols = Patrol::with("agent")
+            ->with("site")
+            ->with("scans.agent")
+            ->with("scans.area")
+            ->where("status", "closed")
+            ->where("agency_id", $agencyId)
+            ->orderByDesc("id")
+            ->get();
+        return response()->json([
+            "status"=>"success",
+            "patrols"=>$patrols
+        ]);
+    }
+
+
+
 
 
     /**
@@ -120,17 +205,9 @@ class AppManagerController extends Controller
         try {
             // Validation des données
             $data = $request->validate([
-                "site_id" => "required|int|exists:sites,id",
-                "agent_id" => "required|int|exists:agents,id",
-                "agency_id" => "required|int|exists:agencies,id",
                 "patrol_id" => "required|int|exists:patrols,id",
                 "comment_text" => "nullable|string",
                 "comment_audio" => "nullable|file|mimes:audio/mpeg,mpga,mp3,wav",
-                "scans.*.latlng" => "required|string",
-                "scans.*.comment" => "nullable|string",
-                "scans.*.agent_id" => "nullable|int|exists:agents,id",
-                "scans.*.patrol_id" => "required|int|exists:patrols,id",
-                "scans.*.area_id" => "required|int|exists:areas,id",
             ]);
 
             // Gestion du fichier audio s'il est présent
@@ -142,44 +219,21 @@ class AppManagerController extends Controller
                 $filePath = $audioFile->storeAs($audioPath, $filename, 'public');
                 $data['comment_audio'] = url("storage/{$filePath}");
             }
-
             // Ajout des informations de fin de patrouille
             $now = Carbon::now();
             $data["ended_at"] = $now->toDateTimeString();
-            $data["status"] = "terminate";
+            $data["status"] = "closed";
 
             $patrol = Patrol::find($data["patrol_id"]);
-            if ($patrol) {
-                $patrol->update($data);
-                // Traitement des scans et calcul de la distance
-                $scans = $data["scans"];
-                foreach ($scans as $scan) {
-                    $area = Area::find($scan['area_id']);
-                    // Extraction des coordonnées GPS de la zone et du scan
-                    list($areaLat, $areaLng) = explode(':', $area->latlng);
-                    list($scanLat, $scanLng) = explode(':', $scan['latlng']);
-                    // Calcul de la distance en mètres entre les deux points GPS
-                    $distance = $this->calculateDistance($areaLat, $areaLng, $scanLat, $scanLng);
-                    // Mise à jour du statut du scan en fonction de la distance (1 mètre de tolérance)
-                    if ($distance <= 1) {
-                        $scan['status'] = "success";
-                        $scan['distance'] = "{$distance} m";
-                    } else {
-                        $scan['status'] = "fail";
-                        $scan['distance'] = "{$distance} m";
-                    }
-                    //Sauvegarde des données du scan patrouille
-                    PatrolScan::create($scan);
-                }
-                return response()->json([
-                    "status" => "success",
-                    "response" => $patrol
-                ]);
-            } else {
-                return response()->json([
-                    "errors"=>"Echec de traitement de la requête !"
-                ], );
-            }
+            $patrol->ended_at = $data["ended_at"];
+            $patrol->comment_text = $data["comment_text"] ?? null;
+            $patrol->comment_audio = $data["comment_audio"] ?? null;
+            $patrol->status = $data["status"];
+            $patrol->save();
+            return response()->json([
+                "status" => "success",
+                "result" => $patrol
+            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $errors = $e->validator->errors()->all();
             return response()->json(['errors' => $errors], );
@@ -222,7 +276,7 @@ class AppManagerController extends Controller
 
 
     /**
-     * Allow to delete some data 
+     * Allow to delete some data
      * It change the status of tuple to deleted
     */
     public function triggerDelete(Request $request):JsonResponse
@@ -232,7 +286,7 @@ class AppManagerController extends Controller
                 'table'=>'required|string',
                 'id'=>'required|int'
             ]);
-            
+
             $result = DB::table($data['table'])
                 ->where('id', $data['id'])
                 ->update(['status' => 'deleted']);
@@ -274,6 +328,40 @@ class AppManagerController extends Controller
         // Télécharger le fichier PDF
         return $pdf->download('areas_qrcodes_printing_'.$siteId.'.pdf');
     }
+
+    /**
+     * Login agent
+     * @param Request $request
+     * @return JsonResponse
+    */
+    public function loginAgent(Request $request) {
+        try {
+            // Validation des données
+            $data = $request->validate([
+                "matricule" => "required|string",
+                "password" => "required|string",
+            ]);
+
+            $agent = Agent::with("site")->where("matricule", $data["matricule"])
+                ->where("password", $data["password"])->where("status", "actif")->first();
+            if($agent){
+                return response()->json([
+                    "status"=>"success",
+                    "agent"=>$agent
+                ]);
+            }else{
+                return response()->json(['errors' => 'Matricule ou mot de passe erroné !'], );
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            return response()->json(['errors' => $errors], );
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['errors' => $e->getMessage()], );
+        }
+    }
+
+
+
 
 
 

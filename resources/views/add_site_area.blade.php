@@ -40,6 +40,7 @@
                                 <input id="validation-form-2" v-model="form.phone" type="tel" name="phone" class="form-control" placeholder="+(243)xx xxx xxx" minlength="10">
                             </div>
 
+
                             <h2 class="font-medium text-base text-primary mr-auto mt-3">
                                 Zones de patrouille *
                             </h2>

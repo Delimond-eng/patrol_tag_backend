@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Agent extends Model
+class Announce extends Model
 {
     use HasFactory;
 
-     /**
+    /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'agents';
+    protected $table = 'announces';
 
     /**
      * The primary key for the model.
@@ -30,12 +30,10 @@ class Agent extends Model
      * @var array
      */
     protected $fillable = [
-        "matricule",
-        "fullname",
-        "password",
-        "role",
-        "agency_id",
-        "site_id"
+        "title",
+        "content",
+        "site_id",
+        "agency_id"
     ];
 
     /**
@@ -70,21 +68,10 @@ class Agent extends Model
 
 
     /**
-     * Agency Belongs to site
+     * Agency Has many sites
      * @return BelongsTo
-    */
+     */
     public function site() : BelongsTo{
         return $this->belongsTo(Site::class, foreignKey:"site_id",);
     }
-
-
-
-    /**
-     * Belongs to agency
-     * @return BelongsTo
-    */
-    public function agencie() : BelongsTo{
-        return $this->belongsTo(Agencie::class, foreignKey:"agency_id",);
-    }
-
 }

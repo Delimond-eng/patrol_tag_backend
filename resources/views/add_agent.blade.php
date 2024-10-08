@@ -22,15 +22,22 @@
                         <!-- BEGIN: Validation Form -->
                         <form class="form-agent" method="POST" action="{{ route("agent.create") }}" @submit.prevent="createAgent">
                             <div class="input-form">
+                                <label for="role-form-2" class="form-label w-full flex flex-col sm:flex-row"> Rôle <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
+                                <select id="role-form-2" v-model="form.role" class="form-select" required>
+                                    <option value="" selected hidden> Sélectionnez un rôle</option>
+                                    <option value="guard">Agent de sécurité</option>
+                                    <option value="supervisor">Superviseur</option>
+                                </select>
+                            </div>
+                            <div class="input-form mt-2" v-if="form.role !=='supervisor'">
                                 <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Site affecté <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
-                                <select class="form-select w-full" v-model="form.site_id" required>
+                                <select class="form-select w-full" v-model="form.site_id">
                                     <option label="Sélectionnez un site affecté" selected hidden></option>
                                     @foreach ($sites as $site)
                                     <option value="{{ $site->id }}">{{ $site->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-
                             <div class="input-form mt-2">
                                 <label for="validation-form-1" class="form-label w-full flex flex-col sm:flex-row"> Matricule <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
                                 <input id="validation-form-1" v-model="form.matricule" type="text" name="matricule" class="form-control" placeholder="Entrer le n° matricule de l'agent" minlength="2" required>
@@ -44,7 +51,7 @@
                                 <label for="validation-form-2" class="form-label w-full flex flex-col sm:flex-row"> Mot de passe <span class="sm:ml-auto mt-1 sm:mt-0 text-xs text-slate-500">*</span> </label>
                                 <input id="validation-form-2" v-model="form.password" type="text" name="phone" class="form-control" placeholder="Entrer le mot de passe" minlength="5" required>
                             </div>
-                            <button :disabled="isLoading" type="submit" class="btn btn-primary mt-5">Enregistrer <span v-if="isLoading"><i data-loading-icon="oval" data-color="white" class="w-4 h-4 ml-2"></i></button>
+                            <button :disabled="isLoading" type="submit" class="btn btn-primary mt-5">Enregistrer <span v-if="isLoading"><i data-loading-icon="oval" data-color="white" class="w-4 h-4 ml-2"></i> </span></button>
                             <button @click.prevent="reset" type="button" class="btn btn-light mt-5">Annuler</button>
                         </form>
                         <!-- END: Validation Form -->
@@ -71,7 +78,6 @@
                         </div>
                         <!-- END: Failed Notification Content -->
                     </div>
-
                 </div>
             </div>
             <!-- END: Form Validation -->

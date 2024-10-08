@@ -58,6 +58,7 @@ class PatrolScan extends Model
     protected $casts = [
         'created_at'=>'datetime:d/m/Y H:i',
         'updated_at'=>'datetime:d/m/Y H:i',
+        'time'=>'datetime:d/m/Y H:i',
     ];
 
     /**

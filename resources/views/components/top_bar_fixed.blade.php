@@ -4,7 +4,7 @@
         <!-- BEGIN: Logo -->
         <a href="#" class="-intro-x hidden md:flex">
             <img alt="Patrol Tag" class="w-6" src="assets/images/patrol.svg">
-            <span class="text-white font-bold text-lg ml-3">PATROL TAG </span>
+            <span class="text-white font-bold text-lg ml-3">SALAMA </span>
         </a>
         <!-- END: Logo -->
         <!-- BEGIN: Breadcrumb -->
@@ -104,7 +104,8 @@
         <!-- END: Search -->
         <!-- BEGIN: Notifications -->
         <div class="intro-x dropdown mr-4 sm:mr-6">
-            <div class="dropdown-toggle notification notification--bullet cursor-pointer" role="button" aria-expanded="false" data-tw-toggle="dropdown"> <i data-lucide="mic" class="notification__icon dark:text-slate-500"></i> </div>
+            <div class="dropdown-toggle notification notification--bullet cursor-pointer" role="button" aria-expanded="false" data-tw-toggle="dropdown">
+                <img src="assets/images/radio.svg" class="h-8 w-8"> </div>
             <div class="notification-content pt-2 dropdown-menu">
                 <div class="notification-content__box dropdown-content">
                     <div class="notification-content__title">Radio</div>

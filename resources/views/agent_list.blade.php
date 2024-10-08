@@ -28,7 +28,7 @@
                         <th class="whitespace-nowrap">NOM & MATRICULE</th>
                         <th class="text-center whitespace-nowrap">MOT DE PASSE APP</th>
                         <th class="text-center whitespace-nowrap">SITE</th>
-                        <th class="text-center whitespace-nowrap">STATUS</th>
+                        <th class="text-center whitespace-nowrap">ROLE</th>
                         <th class="text-center whitespace-nowrap">ACTIONS</th>
                     </tr>
                 </thead>
@@ -48,11 +48,11 @@
                         <td class="text-center"> <a class="flex items-center justify-center underline decoration-dotted" href="javascript:;">@{{ data.password }}</a> </td>
                         <td class="text-center capitalize uppercase"><span v-if="data.site">@{{ data.site.name }}</span></td>
                         <td class="w-40">
-                            <div class="flex items-center justify-center text-success"> <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> @{{ data.status }} </div>
+                            <div class="flex items-center justify-center text-success"> <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> @{{ data.role }} </div>
                         </td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center text-primary mr-3" href="javascript:;" @click.prevent="form.fullname=data.fullname; form.id= data.id;" data-tw-toggle="modal" data-tw-target="#modal-edit-on"> <i data-lucide="arrow-left-right" class="w-4 h-4 mr-1"></i>Changer site </a>
+                                <a class="flex items-center text-primary mr-3" v-if="data.role !=='supervisor'" href="javascript:;" @click.prevent="form.fullname=data.fullname; form.id= data.id;" data-tw-toggle="modal" data-tw-target="#modal-edit-on"> <i data-lucide="arrow-left-right" class="w-4 h-4 mr-1"></i>Changer site </a>
                                 <a class="flex items-center text-danger" href="javascript:;"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i></a>
                             </div>
                         </td>

@@ -6,44 +6,40 @@ new Vue({
             error: null,
             result: null,
             isLoading: false,
-            pristine: null,
-            agents: [],
-            search: '',
-            form: {
-                id: "",
-                matricule: "",
-                fullname: "",
-                password: "",
-                site_id: "",
-                role:""
-            }
+            pristine:null,
+            form:{
+                title:"",
+                content:"",
+                site_id:""
+            },
+            filter_date:'',
+            announces:[],
+            sites:[],
+            delete_id:''
         };
     },
 
     mounted() {
         // Une fois que Vue.js est chargé, on cache le loader
         document.getElementById('loader').style.display = 'none';
-        //init pristine script
-        if (document.querySelector(".form-agent") !== null) {
-            this.pristine = new Pristine(document.querySelector(".form-agent"), {
-                classTo: "input-form",
-                errorClass: "has-error",
-                errorTextParent: "input-form",
-                errorTextClass: "text-danger mt-2"
-            });
-        }
-        this.viewAllAgents();
+
+        this.pristine = new Pristine(document.querySelector(".form-announce"), {
+            classTo: "input-form",
+            errorClass: "has-error",
+            errorTextParent: "input-form",
+            errorTextClass: "text-danger mt-2"
+        });
+
+        this.viewAllSites();
+        this.viewAllAnnounces();
     },
 
     methods: {
-        createAgent(event) {
+        createAnnounce(event) {
             const isValid = this.pristine.validate();
             if (isValid) {
                 const url = event.target.getAttribute("action");
                 this.isLoading = true;
-                if(this.form.role === 'supervisor'){
-                    this.form.site_id = '';
-                }
                 postJson(url, this.form)
                     .then(({ data, status }) => {
                         this.isLoading = false;
@@ -61,11 +57,10 @@ new Vue({
                                     stopOnFocus: true
                                 }).showToast();
                             }, 100)
-
                         }
                         if (data.result) {
-                            console.log(data.result);
                             this.error = null;
+                            console.log(data.result);
                             this.result = data.result;
                             new Toastify({
                                 node: $("#success-notification-content").clone().removeClass("hidden")[0],
@@ -76,57 +71,82 @@ new Vue({
                                 position: "right",
                                 stopOnFocus: true
                             }).showToast();
-                            this.viewAllAgents();
-                            if (document.querySelector("#btn-reset") !== null) {
-                                document.querySelector("#btn-reset").click()
-                            }
+                            this.viewAllAnnounces();
                             // clean fields
-                            this.reset();
+                            setTimeout(() => {
+                                this.reset();
+                            }, 100);
                         }
                     })
                     .catch((err) => {
                         this.isLoading = false;
                         this.error = err;
+                        console.log(err);
                     });
             }
 
         },
 
-        reset() {
-            this.form = {
-                matricule: "",
-                fullname: "",
-                password: "",
-                site_id: "",
-                role:""
-            }
+        deleteAnnounce(id) {
+            let self = this;
+            this.delete_id = id;
+            postJson("/delete", {
+                table: 'announces',
+                id: id
+            })
+                .then((res) => {
+                    this.viewAllAnnounces();
+                    self.delete_id = "";
+                })
+                .catch((err) => {
+                    self.delete_id = "";
+                });
         },
 
-        viewAllAgents() {
-            get("/agents")
+        reset() {
+            this.form = {
+                title:"",
+                content:"",
+                site_id:""
+            }
+            document.getElementById('btn-reset').click();
+        },
+        viewAllAnnounces() {
+            get("/announces.all")
                 .then((res) => {
-                    this.agents = res.data.agents;
+                    this.announces = res.data.announces;
                 })
                 .catch((err) => console.log("error"));
         },
 
-
+        viewAllSites() {
+            get("/sites")
+                .then((res) => {
+                    this.sites = res.data.sites;
+                })
+                .catch((err) => console.log("error"));
+        },
     },
 
 
     computed: {
-        allAgents() {
-            if (this.search && this.search.trim()) {
-                return this.agents.filter((el) =>
-                    el.fullname
-                    .toLowerCase()
-                    .includes(this.search.toLowerCase()) || el.matricule
-                    .toLowerCase()
-                    .includes(this.search.toLowerCase())
+        allSites() {
+            return this.sites;
+        },
+
+        allAnnounces() {
+            if(this.filter_date){
+                const [year, month, day] = this.filter_date.split('-');
+                // Formater en JJ/MM/AAAA
+                const formattedDate = `${day}/${month}/${year}`;
+                return this.announces.filter((el) =>
+                    el.created_at.includes(formattedDate)
                 );
-            } else {
-                return this.agents;
+            }
+            else{
+                return this.announces;
             }
         }
+
     }
 });

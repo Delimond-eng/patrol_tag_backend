@@ -7,7 +7,7 @@
         <div class="hidden xl:flex flex-col min-h-screen">
             <a href="#" class="-intro-x flex items-center pt-5">
                 <img alt="Patrol Tag" class="w-6" src="assets/images/patrol.svg">
-                <span class="text-white text-lg font-extrabold ml-3"> PATROL TAG </span>
+                <span class="text-white text-lg font-extrabold ml-3"> SALAMA </span>
             </a>
             <div class="my-auto">
                 <img alt="Patrol Tag" class="-intro-x w-1/2 -mt-16" src="assets/images/illustration.svg">

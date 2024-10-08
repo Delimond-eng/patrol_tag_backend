@@ -7,6 +7,7 @@ use App\Models\Agent;
 use App\Models\Area;
 use App\Models\Schedules;
 use App\Models\Site;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,9 +28,19 @@ class AdminController extends Controller
                 "adresse"=>"required|string",
                 "logo"=>"nullable|file",
                 "phone"=>"nullable|string",
-                "email"=>"nullable|string",
+                "email"=>"email|string",
+                "password"=>"required|string",
+                "username"=>"required|string"
             ]);
             $response = Agencie::create($data);
+            if($response){
+                User::create([
+                    "name"=>$data["username"],
+                    "password"=>bcrypt($data["password"]),
+                    "email"=>$data["email"],
+                    "agency_id"=>$response->id
+                ]);
+            }
             return response()->json([
                 "status"=>"success",
                 "response"=>$response
@@ -50,7 +61,7 @@ class AdminController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function createAgencieSite(Request $request)
+    public function createAgencieSite(Request $request):JsonResponse
     {
         try{
             $data = null;
@@ -129,6 +140,40 @@ class AdminController extends Controller
         }
     }
 
+
+    /**
+     * complete existing area with GPS DATA
+     * @return JsonResponse
+    */
+    public function completeArea(Request $request) : JsonResponse{
+        try {
+            $data = $request->validate([
+                "area_id"=>"required|int|exists:areas,id",
+                "latlng"=>"required|string"
+            ]);
+
+            $area = Area::where("status", "actif")->where("id", $data["area_id"])->first();
+            if($area){
+                $area->latlng = $data["latlng"];
+                $area->save();
+                return response()->json([
+                    "status" => "success",
+                    "result" => $area
+                ]);
+            }
+            else{
+                return response()->json(['errors' => "Zone scannée non valide ." ]);
+            }
+        }
+        catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            return response()->json(['errors' => $errors ]);
+        }
+        catch (\Illuminate\Database\QueryException $e){
+            return response()->json(['errors' => $e->getMessage() ]);
+        }
+    }
+
     /**
      * Generate qrcode data image
     */
@@ -181,7 +226,8 @@ class AdminController extends Controller
                     "matricule"=>"required|string|unique:agents,matricule",
                     "fullname"=>"required|string",
                     "password"=>"required|string",
-                    "site_id"=>"required|int|exists:sites,id"
+                    "site_id"=>"nullable|int|exists:sites,id",
+                    "role"=>"nullable|string"
                 ]);
                 $data["agency_id"] = Auth::user()->agency_id;
                 $response = Agent::updateOrCreate(
