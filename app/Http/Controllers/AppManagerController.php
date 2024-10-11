@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agent;
+use App\Models\AgentRequest;
 use App\Models\Announce;
 use App\Models\Area;
 use App\Models\Patrol;
 use App\Models\PatrolScan;
+use App\Models\Schedules;
+use App\Models\Signalement;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -94,12 +97,15 @@ class AppManagerController extends Controller
         ], 500);
     }
 
+
+
     /**
-     * Login agent
+     * Create announce
      * @param Request $request
      * @return JsonResponse
      */
-    public function createAnnounce(Request $request) {
+    public function createAnnounce(Request $request): JsonResponse
+    {
         try {
             // Validation des données
             $data = $request->validate([
@@ -127,9 +133,127 @@ class AppManagerController extends Controller
     }
 
 
+
+    /**
+     * Create requests
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function createRequest(Request $request): JsonResponse
+    {
+        try {
+            // Validation des données
+            $data = $request->validate([
+                "object" => "required|string",
+                "description" => "required|string",
+                "agent_id"=>"required|int|exists:agents,id",
+                "agency_id"=>"required|int|exists:agencies,id",
+            ]);
+            $response = AgentRequest::create($data);
+            if($response){
+                return response()->json([
+                    "status"=>"success",
+                    "result"=>$response
+                ]);
+            }else{
+                return response()->json(['errors' => 'Echec du traitement de la requête !'],);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            return response()->json(['errors' => $errors], );
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['errors' => $e->getMessage()], );
+        }
+    }
+
+
+    /**
+     * View all requests
+     * @return JsonResponse
+    */
+    public function viewAllRequests() : JsonResponse
+    {
+        $agencyId = Auth::user()->agency_id;
+        $requests = AgentRequest::with("agent")
+            ->where("agency_id", $agencyId)
+            ->orderByDesc("id")
+            ->get();
+        return response()->json([
+            "status"=>"success",
+            "requests"=>$requests
+        ]);
+    }
+
+
+    /**
+     * Create signalement
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function createSignalement(Request $request): JsonResponse
+    {
+            try {
+                // Validation des données
+                $data = $request->validate([
+                    "title" => "required|string",
+                    "description" => "required|string",
+                    "media" => "nullable|file|mimes:jpeg,png,jpg,gif,mp4,mov,avi|max:2048",
+                    "site_id" => "required|int|exists:sites,id",
+                    "agent_id" => "required|int|exists:agents,id",
+                    "agency_id" => "required|int|exists:agencies,id"
+                ]);
+
+                // Vérifier si un fichier est fourni dans le champ 'media'
+                if ($request->hasFile('media')) {
+                    $file = $request->file('media');
+                    $agencyId = $data['agency_id'];
+                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $path = "uploads/agence_" . $agencyId;
+                    $file->storeAs($path, $filename, 'public');
+                    $data['media'] = url("storage/$path/$filename");
+                }
+                $response = Signalement::create($data);
+
+                if($response) {
+                    return response()->json([
+                        "status" => "success",
+                        "result" => $response
+                    ]);
+                } else {
+                    return response()->json(['errors' => 'Echec du traitement de la requête !']);
+                }
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $errors = $e->validator->errors()->all();
+                return response()->json(['errors' => $errors]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                return response()->json(['errors' => $e->getMessage()]);
+            }
+    }
+
+
+
+    /**
+     * view all signalements
+     * @return JsonResponse
+    */
+    public function viewAllSignalements():JsonResponse
+    {
+        $agencyId = Auth::user()->agency_id;
+        $signalements = Signalement::with("agent")
+            ->with("site")
+            ->where("agency_id", $agencyId)
+            ->orderByDesc("id")
+            ->get();
+        return response()->json([
+            "status"=>"success",
+            "signalements"=>$signalements
+        ]);
+    }
+
+
+
     /**
      * Allow to load announces from mobile by agent
-     * @param int $siteId
      * @return JsonResponse
     */
     public function loadAnnouncesFromMobile(Request $request):JsonResponse{
@@ -194,7 +318,6 @@ class AppManagerController extends Controller
 
 
 
-
     /**
      * Close Patrol Tag
      * @param Request $request
@@ -248,7 +371,7 @@ class AppManagerController extends Controller
      * Calcul de la distance entre deux points GPS en mètres
      * Utilisation de la formule de Haversine
     */
-    private function calculateDistance($lat1, $lng1, $lat2, $lng2)
+    private function calculateDistance($lat1, $lng1, $lat2, $lng2): float|int
     {
         $earthRadius = 6371000; // Rayon de la Terre en mètres
         // Conversion des degrés en radians
@@ -270,7 +393,7 @@ class AppManagerController extends Controller
 
         // Calcul de la distance
         $distance = $earthRadius * $c;
-        return $distance; // Distance en mètres
+        return round($distance); // Distance en mètres
     }
 
 
@@ -307,7 +430,7 @@ class AppManagerController extends Controller
 
     /**
      * Test generate PDF
-     * @param int|null $eventID
+     * @param int $siteId
      * @return Response
      */
     public function generatePdfWithQRCodes(int $siteId)
@@ -327,6 +450,82 @@ class AppManagerController extends Controller
 
         // Télécharger le fichier PDF
         return $pdf->download('areas_qrcodes_printing_'.$siteId.'.pdf');
+    }
+
+
+    /**
+     * Create planning
+     * @param Request $request
+     * @return JsonResponse
+    */
+    public function createPlanning(Request $request) : JsonResponse
+    {
+        try {
+            // Validation des données
+            $data = $request->validate([
+                "schedules.*.libelle" => "required|string",
+                "schedules.*.start_time" => "required|string",
+                "schedules.*.end_time" => "nullable|string",
+                "schedules.*.site_id" => "required|int|exists:sites,id",
+            ]);
+
+            $schedules = $data["schedules"];
+            foreach ($schedules as $schedule){
+                $schedule["agency_id"] = Auth::user()->agency_id;
+                Schedules::updateOrCreate([
+                    "site_id"=>$schedule["site_id"],
+                    "libelle"=>$schedule["libelle"]
+                ], $schedule);
+            }
+            return response()->json([
+                "status" => "success",
+                "result" => "Planning créé avec succès"
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            return response()->json(['errors' => $errors]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['errors' => $e->getMessage()]);
+        }
+    }
+
+
+    /**
+     * View all schedules from admin
+     * @return JsonResponse
+    */
+    public function viewAllSchedulesByAdmin():JsonResponse
+    {
+        $agencyId = Auth::user()->agency_id;
+        $schedules = Schedules::with("site")
+            ->where("status", "actif")
+            ->where("agency_id", $agencyId)
+            ->get();
+        return response()->json([
+            "status"=>"success",
+            "schedules"=>$schedules
+        ]);
+    }
+
+
+    /**
+     * View all Schedules for app agent guard
+     * @param Request $request
+     * @return JsonResponse
+    */
+    public function viewAllSchedulesByApp(Request $request):JsonResponse
+    {
+        $agencyId = $request->query("agency_id");
+        $siteId = $request->query("site_id");
+        $schedules = Schedules::with("site")
+            ->where("status", "actif")
+            ->where("agency_id", $agencyId)
+            ->where("site_id", $siteId)
+            ->get();
+        return response()->json([
+            "status"=>"success",
+            "schedules"=>$schedules
+        ]);
     }
 
     /**

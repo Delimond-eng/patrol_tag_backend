@@ -84,10 +84,7 @@
                                                                     <span>@{{ data.time }}</span>
                                                                 </div>
                                                             </div>
-                                                            <div class="text-slate-500 mt-1"><span>Distance : @{{ data.distance }}</span> | <span class="font-semibold">Agent : @{{ data.agent.matricule }} - @{{ data.agent.fullname }}</span>
-                                                                <span class="py-1 px-2 rounded-md text-xs bg-slate-500 text-white cursor-pointer font-medium ml-6">
-                                                                    success
-                                                                </span>
+                                                            <div class="text-slate-500 mt-1"><span>Distance : @{{ data.status }}</span> | <span class="font-semibold">Agent : @{{ data.agent.matricule }} - @{{ data.agent.fullname }}</span>
                                                             </div>
                                                         </div>
                                                     </div>

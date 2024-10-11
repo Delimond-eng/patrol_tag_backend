@@ -72,10 +72,13 @@ Route::get('/site.create', function () {
     return view('add_site_area');
 })->name('site.create');
 
-Route::view("/reports", "reports");
-Route::view("/announces", "announces");
+Route::view("/reports", "reports")->name("reports");
+Route::view("/announces", "announces")->name("announces");
+Route::view("/requests", "requests")->name("requests");
+Route::view("/signalements", "signalements")->name("signalements");
+Route::view("/schedules", "schedules")->name("schedules");
 
-
+//VIEW ALL ANNOUNCES
 Route::get("/announces.all", function (){
     $agencyId = Auth::user()->agency_id;
     $announces = \App\Models\Announce::with("site")
@@ -88,10 +91,35 @@ Route::get("/announces.all", function (){
     ]);
 });
 
+//ALLOW TO CREATE SITE
 Route::post("site.create", [AdminController::class, "createAgencieSite"])->name("site.create");
+
+//ALLOW TO CREATE AGENT
 Route::post("agent.create", [AdminController::class, "createAgent"])->name("agent.create");
+
+//ALLOW TO CREATE ANNOUNCE
 Route::post("announce.create", [AppManagerController::class, "createAnnounce"])->name("announce.create");
+
+//ALLOW TO CREATE SCHEDULES
+Route::post("schedules.create", [AppManagerController::class, "createPlanning"])->name("schedules.create");
+
+//ALL TO DELETE ANYTHING
 Route::post("delete", [AppManagerController::class, "triggerDelete"])->name("delete");
+
+//LOAD & DOWNLOAD AREA PDF CONTENT QRCODE FOR SCANNING
 Route::get("/loadpdf/{siteId}", [AppManagerController::class, "generatePdfWithQRCodes"])->name("loadpdf");
+
+//VIEW ALL PENDING PATROLS
 Route::get("/patrols.pending", [AppManagerController::class, "viewPendingPatrols"])->name("patrols.pending");
+
+//VIEW PATROLS REPORTS
 Route::get("/patrols.reports", [AppManagerController::class, "viewPatrolReports"])->name("patrols.reports");
+
+//VIEW REQUESTS
+Route::get("/requests.all", [AppManagerController::class, "viewAllRequests"])->name("requests.all");
+
+//VIEW SIGNALEMENTS
+Route::get("/signalements.all", [AppManagerController::class, "viewAllSignalements"])->name("signalements.all");
+
+//VIEW SCHEDULES
+Route::get("/schedules.all", [AppManagerController::class, "viewAllSchedulesByAdmin"])->name("schedules.all");

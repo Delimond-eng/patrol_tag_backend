@@ -42,6 +42,7 @@
                                         <div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">@{{ data.code }}
                                         </div>
                                     </div>
+                                </div>
                             </td>
                             <td class="concat"> @{{ data.adresse }}</td>
                             <td class="text-center">@{{ data.latlng }}</td>

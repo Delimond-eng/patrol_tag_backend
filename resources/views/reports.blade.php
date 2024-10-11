@@ -26,6 +26,7 @@
                     <div class="w-40 relative text-slate-500">
                         <input type="date" v-model="filter_date" @input="filter_site=''" class="form-control">
                     </div>
+
                 </div>
             </div>
             <!-- BEGIN: Data List -->
@@ -109,7 +110,7 @@
                                                         <span>@{{ data.time }}</span>
                                                     </div>
                                                 </div>
-                                                <div class="text-slate-500 mt-1"><span>Distance : @{{ data.distance }}</span> | <span class="font-semibold">Agent : @{{ data.agent.matricule }} - @{{ data.agent.fullname }}</span>
+                                                <div class="text-slate-500 mt-1"><span>Distance : @{{ data.status }}</span> | <span class="font-semibold">Agent : @{{ data.agent.matricule }} - @{{ data.agent.fullname }}</span>
 
                                                 </div>
                                                 <h6 class="font-medium leading-none mt-3" v-if="data.comment">Remarque</h6>

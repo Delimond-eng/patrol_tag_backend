@@ -6,41 +6,92 @@ new Vue({
             error: null,
             result: null,
             isLoading: false,
-            pristine:null,
+            pristine: null,
+            schedules:[],
+
             form:{
-                title:"",
-                content:"",
-                site_id:""
+                site_id:'',
+                schedules:[
+                    {
+                        libelle:'',
+                        start_time:'',
+                        end_time:'',
+                        site_id:'',
+                    }
+                ]
             },
-            filter_date:'',
-            announces:[],
             sites:[],
-            delete_id:''
+            search:""
         };
     },
 
     mounted() {
         // Une fois que Vue.js est chargé, on cache le loader
         document.getElementById('loader').style.display = 'none';
-
-        this.pristine = new Pristine(document.querySelector(".form-announce"), {
+        this.pristine = new Pristine(document.querySelector(".form-planning"), {
             classTo: "input-form",
             errorClass: "has-error",
             errorTextParent: "input-form",
             errorTextClass: "text-danger mt-2"
         });
-
+        this.viewAllSchedules()
         this.viewAllSites();
-        this.viewAllAnnounces();
     },
 
     methods: {
-        createAnnounce(event) {
+        viewAllSites() {
+            get("/sites").then((res) => {
+                    this.sites = res.data.sites;
+                })
+                .catch((err) => console.log("error"));
+        },
+        viewAllSchedules() {
+            get("/schedules.all").then((res) => {
+                    this.schedules = res.data.schedules;
+                })
+                .catch((err) => console.log("error"));
+        },
+
+        addField(){
+            this.form.schedules.push( {
+                libelle:'',
+                start_time:'',
+                end_time:'',
+                site_id:'',
+            });
+        },
+
+        removeField(item){
+            let index = this.form.schedules.indexOf(item);
+            this.form.schedules.splice(index, 1);
+        },
+
+        reset(){
+            this.form = {
+                site_id:'',
+                schedules:[
+                    {
+                        libelle:'',
+                        start_time:'',
+                        end_time:'',
+                        site_id:'',
+                    }
+                ]
+            }
+            document.getElementById('btn-reset').click();
+        },
+
+        createSchedules(event){
             const isValid = this.pristine.validate();
             if (isValid) {
+                const forms = [];
                 const url = event.target.getAttribute("action");
+                for(let field of this.form.schedules){
+                    field.site_id = this.form.site_id;
+                    forms.push(field);
+                }
                 this.isLoading = true;
-                postJson(url, this.form)
+                postJson(url, {schedules:forms})
                     .then(({ data, status }) => {
                         this.isLoading = false;
                         // Gestion des erreurs
@@ -71,7 +122,7 @@ new Vue({
                                 position: "right",
                                 stopOnFocus: true
                             }).showToast();
-                            this.viewAllAnnounces();
+                            this.viewAllSchedules();
                             // clean fields
                             setTimeout(() => {
                                 this.reset();
@@ -84,47 +135,7 @@ new Vue({
                         console.log(err);
                     });
             }
-        },
-
-        deleteAnnounce(id) {
-            let self = this;
-            this.delete_id = id;
-            postJson("/delete", {
-                table: 'announces',
-                id: id
-            })
-                .then((res) => {
-                    this.viewAllAnnounces();
-                    self.delete_id = "";
-                })
-                .catch((err) => {
-                    self.delete_id = "";
-                });
-        },
-
-        reset() {
-            this.form = {
-                title:"",
-                content:"",
-                site_id:""
-            }
-            document.getElementById('btn-reset').click();
-        },
-        viewAllAnnounces() {
-            get("/announces.all")
-                .then((res) => {
-                    this.announces = res.data.announces;
-                })
-                .catch((err) => console.log("error"));
-        },
-
-        viewAllSites() {
-            get("/sites")
-                .then((res) => {
-                    this.sites = res.data.sites;
-                })
-                .catch((err) => console.log("error"));
-        },
+        }
     },
 
 
@@ -133,19 +144,16 @@ new Vue({
             return this.sites;
         },
 
-        allAnnounces() {
-            if(this.filter_date){
-                const [year, month, day] = this.filter_date.split('-');
-                // Formater en JJ/MM/AAAA
-                const formattedDate = `${day}/${month}/${year}`;
-                return this.announces.filter((el) =>
-                    el.created_at.includes(formattedDate)
-                );
+        allSchedules(){
+            if (this.search){
+                return this.schedules.filter((el) => {
+                    return el.site_id === this.search;
+                });
             }
             else{
-                return this.announces;
+                return this.schedules;
             }
-        }
 
+        }
     }
 });

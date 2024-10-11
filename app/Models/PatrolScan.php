@@ -37,7 +37,8 @@ class PatrolScan extends Model
         "distance",
         "agent_id",
         "patrol_id",
-        "area_id"
+        "area_id",
+        "status"
     ];
 
     /**

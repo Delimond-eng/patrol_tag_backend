@@ -40,7 +40,7 @@
                 <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left flex flex-col xl:flex-row justify-center xl:justify-start">
                     <button :disabled="isLoading" type="submit" class="btn btn-primary py-3 px-4 w-full align-top">Connecter <span v-if="isLoading"><i data-loading-icon="oval" data-color="white" class="w-4 h-4 ml-2"></i> </span> </button>
                 </div>
-                <div class="intro-x mt-10 xl:mt-24 text-slate-600 dark:text-slate-500 text-center xl:text-left"> Patrol Tag By Rapid Tech Solution. all right reserved. <a class="text-primary dark:text-slate-200" href="#">Privacy Policy</a> </div>
+                <div class="intro-x mt-10 xl:mt-24 text-slate-600 dark:text-slate-500 text-center xl:text-left"> Salama Plateforme. all right reserved. <a class="text-primary dark:text-slate-200" href="#">Privacy Policy</a> </div>
             </div>
 
             <!-- BEGIN: Failed Notification Content -->
