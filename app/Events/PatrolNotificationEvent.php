@@ -11,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class PatrolNotificationEvent
+class PatrolNotificationEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -39,8 +39,8 @@ class PatrolNotificationEvent
     }
 
 
-    public function broadcastAs()
+    public function broadcastAs() : string
     {
-        return "PatrolNotitificationEvent";
+        return "PatrolNotificationEvent";
     }
 }

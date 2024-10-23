@@ -103,14 +103,20 @@
         </div>
         <!-- END: Search -->
         <!-- BEGIN: Notifications -->
-        <div class="intro-x dropdown mr-4 sm:mr-6">
+        <div class="intro-x dropdown mr-4 sm:mr-6" id="TalkieApp">
             <div class="dropdown-toggle notification notification--bullet cursor-pointer" role="button" aria-expanded="false" data-tw-toggle="dropdown">
                 <img src="assets/images/radio.svg" class="h-8 w-8"> </div>
             <div class="notification-content pt-2 dropdown-menu">
                 <div class="notification-content__box dropdown-content">
-                    <div class="notification-content__title">Radio</div>
+                    <div class="notification-content__title" :class="isListening ? 'text-pending' : 'text-primary'">Talkie walkie</div>
                     <div class="w-full text-slate-500 mt-0.5">Veuillez appuyer sur le button pour emettre sur votre canal !</div>
-                    <button class="btn btn-pending-soft w-full mb-2 mt-2"> <i data-lucide="mic" class="w-4 mr-2"></i>Appuyez pour emettre.<i data-loading-icon="three-dots" data-color="pending" class="w-4 h-4 ml-2"></i></button>
+                    <button @mousedown="startRecording"
+                            @mouseup="stopRecording"
+                            :class="isListening ? 'btn-pending-soft' : 'btn-primary-soft'"
+                            class="btn w-full mb-2 mt-2">
+                        <span v-if="isListening"><i data-loading-icon="bars" data-color="#f97316" class="w-4 h-4 mr-2"></i></span>
+                        <span v-else><i data-lucide="mic" data-color="primary" class="w-4 h-4 mr-2"></i> </span> <span v-if="!isListening">Appuyer pour emettre</span>
+                    </button>
                 </div>
             </div>
         </div>

@@ -9,3 +9,12 @@ DATABASA
 password : salama@2024
 username: groupepa_salama_root
 database: groupepa_salama
+
+
+#RUN SERVER AND SOCKET IO
+
+php artisan serve
+php artisan websockets:serve
+
+
+

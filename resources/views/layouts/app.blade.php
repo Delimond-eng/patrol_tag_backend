@@ -10,7 +10,8 @@
     <meta name="keywords" content="Rapid Tech Property">
     <meta name="author" content="Gaston Delimond Dev">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Salama Plateforme By Rapid Tech Solution</title>
+    <meta name="user-id" content="{{ Auth::user()->id }}">
+    <title>Salama Plateforme</title>
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/js/libs/sweetalert2/sweetalert2.min.css') }}" />
@@ -49,8 +50,7 @@
     <script src="{{ asset('assets/js/libs/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('assets/js/libs/vue2.js') }}"></script>
     {{-- For pusher notification  --}}
-    <script src="{{ asset('assets/js/libs/pusher.min.js') }}"></script>
-    <script type="module" src="{{ asset('assets/js/modules/pusher.init.js') }}"></script>
+    <script type="module" src="{{ asset("assets/js/scripts/talkiewalkie_controller.js") }}"></script>
     @yield("scripts")
     <!-- END: JS Assets-->
 </body>

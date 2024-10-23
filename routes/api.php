@@ -45,6 +45,10 @@ Route::middleware(["cors"])->group(function(){
 
     //ALLOW TO GET ALL SCHEDULES
     Route::get("/schedules.all", [AppManagerController::class, "viewAllSchedulesByApp"])->name("schedules.all");
+
+
+    //Emettre sur un canal de talkie walkie
+    Route::post('/send.talk', [\App\Http\Controllers\TalkieWalkieController::class, 'sendTalkAudio']);
 });
 
 

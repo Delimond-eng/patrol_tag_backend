@@ -29,17 +29,18 @@ return [
     */
 
     'connections' => [
-
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
             'secret' => env('PUSHER_APP_SECRET'),
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
-                'host' => env('PUSHER_HOST') ?: '127.0.0.1',
-                'port' => 6001,
-                'scheme' => 'http',
-                'encrypted' => true,
+                'host' => env('PUSHER_HOST') ?: '127.0.0.1',  // Localhost pour WebSockets
+                'cluster' => env('PUSHER_APP_CLUSTER'),       // Cluster pour Pusher
+                'useTLS' => false,                            // Pas de TLS pour WebSockets local
+                'port' => 6001,                               // Port utilisé pour WebSockets
+                'scheme' => 'http',                           // Utilisation de HTTP car pas de SSL/TLS
+                'encrypted' => false,
             ],
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html

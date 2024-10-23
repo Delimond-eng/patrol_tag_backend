@@ -8,7 +8,7 @@
  */
 export async function post(url, form) {
     try {
-        var csrfToken = document
+        const  csrfToken = document
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
         const response = await fetch(url, {

@@ -10,7 +10,7 @@
     <meta name="keywords" content="Rapid Tech Property">
     <meta name="author" content="Gaston Delimond Dev">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Salama Plateforme By Rapid Tech Solution</title>
+    <title>Salama Plateforme</title>
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" />
     <!-- END: CSS Assets-->

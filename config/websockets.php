@@ -34,6 +34,13 @@ return [
         ],
     ],
 
+    'settings' => [
+        'scheme' => 'http',
+        'host' => '127.0.0.1',
+        'port' => 6001,
+        'verify_ssl' => false,
+    ],
+
     /*
      * This class is responsible for finding the apps. The default provider
      * will use the apps defined in this config file.

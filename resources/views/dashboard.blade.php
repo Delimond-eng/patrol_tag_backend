@@ -128,4 +128,6 @@
 
 @section("scripts")
 <script type="module" src="{{ asset("assets/js/scripts/monitoring.js") }}"></script>
+@vite('resources/js/app.js')
+@vite('resources/js/talkie_walkie.js')
 @endsection

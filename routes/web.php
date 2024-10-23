@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+//Route::view("/", "notification");
 
 Auth::routes();
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name("dashboard");
@@ -123,3 +124,7 @@ Route::get("/signalements.all", [AppManagerController::class, "viewAllSignalemen
 
 //VIEW SCHEDULES
 Route::get("/schedules.all", [AppManagerController::class, "viewAllSchedulesByAdmin"])->name("schedules.all");
+
+
+//Emettre sur un canal de talkie walkie
+Route::post('/send.talk', [\App\Http\Controllers\TalkieWalkieController::class, 'sendTalkAudio'])->name('send.talk');
